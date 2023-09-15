@@ -11,14 +11,14 @@ impl Cli {
         };
 
         if let Some(i) = Self::get_flag_index(args, "--file", "-f") {
-            match args.iter().nth(i + 1) {
+            match args.get(i + 1) {
                 Some(file_path) => cli.file_path = Some(file_path.to_string()),
                 None => return Err("Usage: `--file <file_path>`".to_string()),
             }
         }
 
         if let Some(i) = Self::get_flag_index(args, "--output", "-o") {
-            match args.iter().nth(i + 1) {
+            match args.get(i + 1) {
                 Some(output) => cli.output = Some(output.to_string()),
                 None => return Err("Usage: `--output <output>`".to_string()),
             }

@@ -12,7 +12,7 @@ fn main() -> std::io::Result<()> {
     let mut buffer = String::new();
 
     if let Some(file_path) = cli.file_path() {
-        let mut file = File::open(&file_path)?;
+        let mut file = File::open(file_path)?;
         file.read_to_string(&mut buffer)?;
     } else {
         // Read from `stdin` until EOF
