@@ -31,7 +31,11 @@ fn main() -> std::io::Result<()> {
     let lines = count_lines(&buffer);
     let words = count_words(&buffer);
 
-    let res = format!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\n");
+    let mut res = format!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\n");
+    if cli.file_path().is_some() {
+        let file_path = format!("File: {}\n", cli.file_path().unwrap());
+        res.push_str(&file_path);
+    }
 
     if let Some(output) = cli.output() {
         let mut output_file = File::create(output)?;
