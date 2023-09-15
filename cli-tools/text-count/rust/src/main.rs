@@ -5,7 +5,10 @@
 // - print to stdout
 // - save to file
 
-use std::{fs::File, io::Read};
+use std::{
+    fs::File,
+    io::{self, Read},
+};
 
 fn count_bytes(s: &str) -> usize {
     s.len()
@@ -19,32 +22,57 @@ fn count_words(s: &str) -> usize {
     s.split_whitespace().count()
 }
 
-fn main() -> std::io::Result<()> {
-    let args = std::env::args();
+struct Cli {
+    file_path: Option<String>,
+}
 
-    if args.len() == 1 {
-        panic!("Cannot read from stdin. Provide a file path.")
+impl Cli {
+    pub fn new(args: &[String]) -> Result<Self, String> {
+        if let Some(i) = args.iter().position(|arg| arg == "--file") {
+            match args.iter().nth(i + 1) {
+                Some(file_path) => Ok(Cli {
+                    file_path: Some(file_path.to_string()),
+                }),
+                None => Err("Usage: `--file <file_path>`".to_string()),
+            }
+        } else {
+            Ok(Cli { file_path: None })
+        }
     }
 
-    let path = args.last().unwrap();
-    let mut file = File::open(&path)?;
+    pub fn file_path(self) -> Option<String> {
+        self.file_path
+    }
+}
+
+fn main() -> std::io::Result<()> {
+    let args = std::env::args().collect::<Vec<_>>();
+    let cli = Cli::new(&args).expect("Cannot parse arguments");
 
     let mut buffer = String::new();
 
-    file.read_to_string(&mut buffer)?;
+    if let Some(file_path) = cli.file_path() {
+        let mut file = File::open(&file_path)?;
+        file.read_to_string(&mut buffer)?;
+    } else {
+        loop {
+            let input = io::stdin();
+            let read = input.read_line(&mut buffer)?;
+
+            if read == 1 {
+                buffer = buffer[..buffer.len() - 1].to_string();
+                break;
+            } else {
+                continue;
+            }
+        }
+    }
 
     let bytes = count_bytes(&buffer);
     let lines = count_lines(&buffer);
     let words = count_words(&buffer);
 
-    // Un-commenting the four lines below and commenting the fifth one results in one
-    // `write` syscall instead of 4.
-
-    // print!("Lines: {lines} -- ");
-    // print!("Words: {words} -- ");
-    // print!("Bytes: {bytes} -- ");
-    // println!("File: {path}");
-    println!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\nFile: {path}");
+    println!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\n");
 
     Ok(())
 }
