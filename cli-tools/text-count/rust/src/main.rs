@@ -1,10 +1,3 @@
-// Requirements:
-// - read from file
-// - read from stdin if no file is provided
-// - count: words, lines, bytes
-// - print to stdout
-// - save to file
-
 use std::{
     fs::File,
     io::{self, Read},
