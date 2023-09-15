@@ -59,8 +59,7 @@ fn main() -> std::io::Result<()> {
             let input = io::stdin();
             let read = input.read_line(&mut buffer)?;
 
-            if read == 1 {
-                buffer = buffer[..buffer.len() - 1].to_string();
+            if read == 0 {
                 break;
             } else {
                 continue;
