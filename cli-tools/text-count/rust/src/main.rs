@@ -39,6 +39,13 @@ fn main() -> std::io::Result<()> {
     let lines = count_lines(&buffer);
     let words = count_words(&buffer);
 
+    // Un-commenting the four lines below and commenting the fifth one results in one
+    // `write` syscall instead of 4.
+
+    // print!("Lines: {lines} -- ");
+    // print!("Words: {words} -- ");
+    // print!("Bytes: {bytes} -- ");
+    // println!("File: {path}");
     println!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\nFile: {path}");
 
     Ok(())
