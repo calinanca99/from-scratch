@@ -3,55 +3,7 @@ use std::{
     io::{self, Read, Write},
 };
 
-fn count_bytes(s: &str) -> usize {
-    s.len()
-}
-
-fn count_lines(s: &str) -> usize {
-    s.lines().count()
-}
-
-fn count_words(s: &str) -> usize {
-    s.split_whitespace().count()
-}
-
-struct Cli {
-    file_path: Option<String>,
-    output: Option<String>,
-}
-
-impl Cli {
-    pub fn new(args: &[String]) -> Result<Self, String> {
-        let mut cli = Cli {
-            file_path: None,
-            output: None,
-        };
-
-        if let Some(i) = args.iter().position(|arg| arg == "--file" || arg == "-f") {
-            match args.iter().nth(i + 1) {
-                Some(file_path) => cli.file_path = Some(file_path.to_string()),
-                None => return Err("Usage: `--file <file_path>`".to_string()),
-            }
-        }
-
-        if let Some(i) = args.iter().position(|arg| arg == "--output" || arg == "-o") {
-            match args.iter().nth(i + 1) {
-                Some(output) => cli.output = Some(output.to_string()),
-                None => return Err("Usage: `--output <output>`".to_string()),
-            }
-        }
-
-        Ok(cli)
-    }
-
-    pub fn file_path(&self) -> Option<String> {
-        self.file_path.clone()
-    }
-
-    pub fn output(&self) -> Option<String> {
-        self.output.clone()
-    }
-}
+use rust::{cli::Cli, count_bytes, count_lines, count_words};
 
 fn main() -> std::io::Result<()> {
     let args = std::env::args().collect::<Vec<_>>();
@@ -63,11 +15,11 @@ fn main() -> std::io::Result<()> {
         let mut file = File::open(&file_path)?;
         file.read_to_string(&mut buffer)?;
     } else {
+        // Read from `stdin` until EOF
         loop {
-            let input = io::stdin();
-            let read = input.read_line(&mut buffer)?;
+            let bytes_read = io::stdin().read_line(&mut buffer)?;
 
-            if read == 0 {
+            if bytes_read == 0 {
                 break;
             } else {
                 continue;
