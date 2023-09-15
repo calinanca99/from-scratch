@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{self, Read},
+    io::{self, Read, Write},
 };
 
 fn count_bytes(s: &str) -> usize {
@@ -17,24 +17,39 @@ fn count_words(s: &str) -> usize {
 
 struct Cli {
     file_path: Option<String>,
+    output: Option<String>,
 }
 
 impl Cli {
     pub fn new(args: &[String]) -> Result<Self, String> {
+        let mut cli = Cli {
+            file_path: None,
+            output: None,
+        };
+
         if let Some(i) = args.iter().position(|arg| arg == "--file") {
             match args.iter().nth(i + 1) {
-                Some(file_path) => Ok(Cli {
-                    file_path: Some(file_path.to_string()),
-                }),
-                None => Err("Usage: `--file <file_path>`".to_string()),
+                Some(file_path) => cli.file_path = Some(file_path.to_string()),
+                None => return Err("Usage: `--file <file_path>`".to_string()),
             }
-        } else {
-            Ok(Cli { file_path: None })
         }
+
+        if let Some(i) = args.iter().position(|arg| arg == "--output") {
+            match args.iter().nth(i + 1) {
+                Some(output) => cli.output = Some(output.to_string()),
+                None => return Err("Usage: `--output <output>`".to_string()),
+            }
+        }
+
+        Ok(cli)
     }
 
-    pub fn file_path(self) -> Option<String> {
-        self.file_path
+    pub fn file_path(&self) -> Option<String> {
+        self.file_path.clone()
+    }
+
+    pub fn output(&self) -> Option<String> {
+        self.output.clone()
     }
 }
 
@@ -64,7 +79,14 @@ fn main() -> std::io::Result<()> {
     let lines = count_lines(&buffer);
     let words = count_words(&buffer);
 
-    println!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\n");
+    let res = format!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\n");
+
+    if let Some(output) = cli.output() {
+        let mut output_file = File::create(output)?;
+        output_file.write_all(res.as_bytes())?;
+    } else {
+        println!("{res}");
+    }
 
     Ok(())
 }
