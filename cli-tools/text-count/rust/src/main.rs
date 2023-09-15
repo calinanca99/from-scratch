@@ -7,8 +7,6 @@
 
 use std::{fs::File, io::Read};
 
-const CAPACITY: usize = 1024;
-
 fn count_bytes(s: &str) -> usize {
     s.len()
 }
@@ -31,7 +29,7 @@ fn main() -> std::io::Result<()> {
     let path = args.last().unwrap();
     let mut file = File::open(&path)?;
 
-    let mut buffer = String::with_capacity(CAPACITY);
+    let mut buffer = String::new();
 
     file.read_to_string(&mut buffer)?;
 
