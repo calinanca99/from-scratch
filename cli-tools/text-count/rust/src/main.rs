@@ -3,7 +3,7 @@ use std::{
     io::{self, Read, Write},
 };
 
-use rust::{cli::Cli, count_bytes, count_lines, count_words};
+use text_count::{cli::Cli, count_bytes, count_lines, count_words};
 
 fn main() -> std::io::Result<()> {
     let args = std::env::args().collect::<Vec<_>>();

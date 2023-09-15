@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "rust"
+name = "text_count"
 version = "0.1.0"
