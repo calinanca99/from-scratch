@@ -5,7 +5,7 @@
 // - print to stdout
 // - save to file
 
-use std::{fs::File, io::Read, time::Instant};
+use std::{fs::File, io::Read};
 
 const CAPACITY: usize = 1024;
 
@@ -14,11 +14,11 @@ fn count_bytes(s: &str) -> usize {
 }
 
 fn count_lines(s: &str) -> usize {
-    s.lines().collect::<Vec<_>>().len()
+    s.lines().count()
 }
 
 fn count_words(s: &str) -> usize {
-    s.split_whitespace().collect::<Vec<_>>().len()
+    s.split_whitespace().count()
 }
 
 fn main() -> std::io::Result<()> {
@@ -31,30 +31,13 @@ fn main() -> std::io::Result<()> {
     let path = args.last().unwrap();
     let mut file = File::open(&path)?;
 
-    let now = Instant::now();
     let mut buffer = String::with_capacity(CAPACITY);
-    let elapsed = now.elapsed();
-    println!("Buffer allocation took: {} ns", elapsed.as_nanos());
 
-    let now = Instant::now();
     file.read_to_string(&mut buffer)?;
-    let elapsed = now.elapsed();
-    println!("Reading the file took: {} ns", elapsed.as_nanos());
 
-    let now = Instant::now();
     let bytes = count_bytes(&buffer);
-    let elapsed = now.elapsed();
-    println!("Counting the bytes took: {} ns", elapsed.as_nanos());
-
-    let now = Instant::now();
     let lines = count_lines(&buffer);
-    let elapsed = now.elapsed();
-    println!("Counting the lines took: {} ns", elapsed.as_nanos());
-
-    let now = Instant::now();
     let words = count_words(&buffer);
-    let elapsed = now.elapsed();
-    println!("Counting the words took: {} ns", elapsed.as_nanos());
 
     println!("Lines: {lines}\nWords: {words}\nBytes: {bytes}\nFile: {path}");
 
