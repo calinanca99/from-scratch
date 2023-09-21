@@ -19,7 +19,7 @@ fn compress(input: &[u8]) -> Vec<u8> {
 
         let next = input[i + 1];
         if curr == next {
-            curr = input[i + 1];
+            curr = next;
             counter += 1;
 
             i += 1;
@@ -31,7 +31,7 @@ fn compress(input: &[u8]) -> Vec<u8> {
             res.push(counter);
             res.push(curr);
 
-            curr = input[i + 1];
+            curr = next;
             counter = 1;
 
             i += 1;
