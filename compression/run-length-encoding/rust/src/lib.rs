@@ -31,43 +31,30 @@ pub fn compress(input: &[u8]) -> Vec<u8> {
     res
 }
 
+pub fn decompress(input: &[u8]) -> Vec<u8> {
+    let len = input.len();
+
+    let mut res = vec![];
+
+    for i in (0..len).step_by(2) {
+        let frequency = input[i];
+        let element = input[i + 1];
+        // TODO: Consider `push`ing to `res` without allocating
+        // an extra `Vec`.
+        let temp = vec![element; frequency.into()];
+        res.extend(temp);
+    }
+
+    res
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::compress;
+    use crate::{compress, decompress};
 
     #[test]
-    fn it_compresses_array_of_zeroes() {
-        // Arrange
-        let input = [0; 50];
-
-        // Act
-        let res = compress(&input);
-
-        // Assert
-        assert_eq!(res, vec![50, 0])
-    }
-
-    #[test]
-    fn it_compresses_array_of_ones() {
-        // Arrange
-        let input = [1; 50];
-
-        // Act
-        let res = compress(&input);
-
-        // Assert
-        assert_eq!(res, vec![50, 1])
-    }
-
-    #[test]
-    fn it_compresses_mixed_array() {
-        // Arrange
-        let input = [25, 70, 70, 100, 100, 100, 2];
-
-        // Act
-        let res = compress(&input);
-
-        // Assert
-        assert_eq!(res, vec![1, 25, 2, 70, 3, 100, 1, 2])
+    fn property_test() {
+        let data = vec![25, 70, 70, 100, 100, 100, 2];
+        assert_eq!(data, decompress(&compress(&data)));
     }
 }
