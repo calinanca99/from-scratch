@@ -55,13 +55,15 @@ mod tests {
     use crate::{compress, decompress};
 
     #[test]
-    fn property_test() {
-        let mut data = vec![0; 100_000];
+    fn compressing_and_decompressing_leaves_data_unaffected() {
+        let mut data = vec![0; 1_000];
         let mut rng = rand::thread_rng();
-        for x in data.iter_mut() {
-            *x = rng.gen();
-        }
+        for _ in 0..100 {
+            for x in data.iter_mut() {
+                *x = rng.gen();
+            }
 
-        assert_eq!(data, decompress(&compress(&data)));
+            assert_eq!(data, decompress(&compress(&data)));
+        }
     }
 }
