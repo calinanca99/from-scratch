@@ -42,6 +42,7 @@ fn handle_request(req: &Request) -> &'static str {
     }
 }
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Clone, Copy)]
 enum Method {
     GET,
@@ -70,7 +71,7 @@ impl TryFrom<&str> for Request {
         let method = Method::try_from(
             value
                 .split_whitespace()
-                .nth(0)
+                .next()
                 .ok_or("bad request".to_string())?,
         )?;
         let route = value
@@ -79,7 +80,7 @@ impl TryFrom<&str> for Request {
             .ok_or("bad request".to_string())?;
 
         Ok(Self {
-            method: method,
+            method,
             route: route.to_string(),
         })
     }
