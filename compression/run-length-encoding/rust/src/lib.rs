@@ -50,11 +50,18 @@ pub fn decompress(input: &[u8]) -> Vec<u8> {
 
 #[cfg(test)]
 mod tests {
+    use rand::Rng;
+
     use crate::{compress, decompress};
 
     #[test]
     fn property_test() {
-        let data = vec![25, 70, 70, 100, 100, 100, 2];
+        let mut data = vec![0; 100_000];
+        let mut rng = rand::thread_rng();
+        for x in data.iter_mut() {
+            *x = rng.gen();
+        }
+
         assert_eq!(data, decompress(&compress(&data)));
     }
 }
