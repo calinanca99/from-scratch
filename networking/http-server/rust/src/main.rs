@@ -1,30 +1,18 @@
 use std::{
     io::{Read, Write},
-    net::{TcpListener, TcpStream},
+    net::TcpStream,
 };
 
-use http_server::{open_file, Method, Request, Response, Status};
+use http_server::{read_file, server::Server, Method, Request, Response, Status};
 
 fn main() {
-    let addr = "http://127.0.0.1:4000";
-    let server = TcpListener::bind("127.0.0.1:4000").expect("Cannot bind socket");
-
-    println!("Listening on: {}", addr);
-
-    for stream in server.incoming() {
-        match stream {
-            Ok(mut conn) => handle_conn(&mut conn),
-            Err(_) => {
-                println!("Connection failed")
-            }
-        }
-    }
+    Server::new("127.0.0.1:4000", handle_conn).start();
 }
 
 fn handle_conn(conn: &mut TcpStream) {
-    let mut buf = [0; 1024];
-    let bytes_read = conn.read(&mut buf).expect("Cannot read from socket");
-    let req = String::from_utf8(buf[..bytes_read].to_vec()).expect("Cannot read request");
+    let mut buf = vec![0; 1024];
+    let _ = conn.read(&mut buf).expect("Cannot read from socket");
+    let req = String::from_utf8(buf).expect("Cannot read request");
 
     let res = match Request::try_from(req.as_str()) {
         Ok(req) => handle_request(&req),
@@ -38,14 +26,14 @@ fn handle_conn(conn: &mut TcpStream) {
 
 fn handle_request(req: &Request) -> String {
     match req.method() {
-        Method::GET if req.route() == "/" => index(),
-        Method::GET if req.route() == "/health_check" => health_check(),
+        Method::Get if req.route() == "/" => index(),
+        Method::Get if req.route() == "/health_check" => health_check(),
         _ => fallback(),
     }
 }
 
 fn index() -> String {
-    let body = open_file("public/index.html");
+    let body = read_file("public/index.html");
     Response::new(Status::Ok, Some(body)).into()
 }
 
@@ -62,6 +50,6 @@ fn method_not_allowed() -> String {
 }
 
 fn fallback() -> String {
-    let body = open_file("public/not_found.html");
+    let body = read_file("public/not_found.html");
     Response::new(Status::NotFound, Some(body)).into()
 }

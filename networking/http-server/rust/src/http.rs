@@ -1,7 +1,6 @@
-#[allow(clippy::upper_case_acronyms)]
 #[derive(Clone, Copy)]
 pub enum Method {
-    GET,
+    Get,
 }
 
 impl TryFrom<&str> for Method {
@@ -9,7 +8,7 @@ impl TryFrom<&str> for Method {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "GET" => Ok(Method::GET),
+            "GET" => Ok(Method::Get),
             _ => Err("method not allowed".to_string()),
         }
     }
@@ -81,7 +80,7 @@ impl From<Response> for String {
 
         if let Some(body) = response.body {
             format!(
-                "HTTP/1.1 {}\r\nnServer: from-scratch\r\nContent-Length: {}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{}",
+                "HTTP/1.1 {}\r\nServer: from-scratch\r\nContent-Length: {}\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n{}",
                 status, body.as_bytes().len(), body
             )
         } else {

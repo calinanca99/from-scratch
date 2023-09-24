@@ -1,6 +1,6 @@
 use std::{fs::File, io::Read};
 
-pub fn open_file(p: &str) -> String {
+pub fn read_file(p: &str) -> String {
     let mut buf = String::new();
 
     File::open(p)
