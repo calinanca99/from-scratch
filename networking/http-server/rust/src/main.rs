@@ -12,23 +12,25 @@ fn main() {
 fn handle_conn(conn: &mut TcpStream) {
     let mut buf = vec![0; 1024];
     let _ = conn.read(&mut buf).expect("Cannot read from socket");
-    let req = String::from_utf8(buf).expect("Cannot read request");
 
-    let res = match Request::try_from(req.as_str()) {
-        Ok(req) => handle_request(&req),
-        Err(e) if &e == "method not allowed" => method_not_allowed(),
-        Err(_) => bad_request(),
-    };
+    let res = handle_request(buf);
 
     conn.write_all(res.as_bytes())
         .expect("Cannot write to socket");
 }
 
-fn handle_request(req: &Request) -> String {
-    match req.method() {
-        Method::Get if req.route() == "/" => index(),
-        Method::Get if req.route() == "/health_check" => health_check(),
-        _ => fallback(),
+fn handle_request(buf: Vec<u8>) -> String {
+    match String::from_utf8(buf) {
+        Ok(req_body) => match Request::try_from(req_body.as_str()) {
+            Ok(req) => match req.method() {
+                Method::Get if req.route() == "/" => index(),
+                Method::Get if req.route() == "/health_check" => health_check(),
+                _ => fallback(),
+            },
+            Err(e) if e == "method not allowed" => method_not_allowed(),
+            Err(_) => bad_request(),
+        },
+        Err(_) => bad_request(),
     }
 }
 
