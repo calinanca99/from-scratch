@@ -20,8 +20,13 @@ fn main() {
 
         // Don't read the trailing '\n' from `buf`
         let cmd = &buf[..br - 1];
-        let output = Command::new(cmd).output().expect("Cannot run command");
-        let res = String::from_utf8(output.stdout).expect("Cannot convert to String");
+        let res = match Command::new(cmd).output() {
+            Ok(output) => match String::from_utf8(output.stdout) {
+                Ok(s) => s,
+                Err(e) => e.to_string(),
+            },
+            Err(e) => e.to_string(),
+        };
 
         println!("{}", res);
     }
